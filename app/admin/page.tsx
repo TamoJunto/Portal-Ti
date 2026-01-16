@@ -42,6 +42,12 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true)
   const [abaAtiva, setAbaAtiva] = useState<'horas' | 'equipamentos'>('horas')
   const [filtroStatus, setFiltroStatus] = useState('pendente')
+  const ADMINS = ['seu.email@alianca.com', 'outro.admin@alianca.com']
+
+// Se não for admin, redireciona
+    if (!ADMINS.includes(user.email)) {
+      router.push('/portal')
+    }
   
   const [solicitacoesHoras, setSolicitacoesHoras] = useState<SolicitacaoHoras[]>([])
   const [solicitacoesEquipamentos, setSolicitacoesEquipamentos] = useState<SolicitacaoEquipamento[]>([])
@@ -782,4 +788,5 @@ export default function AdminPage() {
       )}
     </div>
   )
+
 }
