@@ -8,9 +8,6 @@ import { ArrowLeft, Clock, Laptop, CheckCircle, XCircle, Filter, ShieldX } from 
 import Header from '@/components/Header'
 import Sidebar from '@/components/Sidebar'
 
-// Lista de emails que podem acessar o admin
-const ADMINS = ['geovana.silva@aliancaempreendedora.org.br'] // ADICIONE SEUS EMAILS AQUI
-
 interface SolicitacaoHoras {
   id: number
   created_at: string
@@ -69,8 +66,14 @@ export default function AdminPage() {
       
       setUser(user)
       
-      // Verificar se é admin
-      if (!ADMINS.includes(user.email || '')) {
+      // Verificar se é admin na tabela usuarios do Supabase
+      const { data: usuario } = await supabase
+        .from('usuarios')
+        .select('is_admin')
+        .eq('email', user.email)
+        .single()
+      
+      if (!usuario || !usuario.is_admin) {
         setIsAdmin(false)
         setLoading(false)
         return
