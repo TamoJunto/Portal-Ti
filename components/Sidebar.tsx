@@ -39,7 +39,7 @@ export default function Sidebar({ activePage, onNavigate }: SidebarProps) {
     <aside style={{
       width: collapsed ? '60px' : '240px',
       backgroundColor: '#1a1a1a',
-      borderRight: '1px solid #e0e0e0',
+      borderRight: '1px solid #333',
       display: 'flex',
       flexDirection: 'column',
       transition: 'width 0.2s ease'
@@ -55,9 +55,8 @@ export default function Sidebar({ activePage, onNavigate }: SidebarProps) {
           border: 'none',
           background: 'none',
           cursor: 'pointer',
-          borderBottom: '1px solid #f0f0f0',
+          borderBottom: '1px solid #333',
           color: 'white'
-          
         }}
       >
         {collapsed ? <ChevronRight size={20} color="white" /> : <ChevronLeft size={20} color="white" />}
@@ -86,16 +85,15 @@ export default function Sidebar({ activePage, onNavigate }: SidebarProps) {
                 borderRadius: '6px',
                 cursor: 'pointer',
                 backgroundColor: isActive ? '#333' : 'transparent',
-                color: isActive ? '#0078d4' : '#333',
+                color: isActive ? '#0078d4' : 'white',
                 fontSize: '14px',
                 fontWeight: isActive ? '600' : '400',
                 textAlign: 'left',
                 transition: 'background-color 0.15s',
                 justifyContent: collapsed ? 'center' : 'flex-start',
-                borderTop: isAdmin ? '1px solid #e0e0e0' : 'none',
+                borderTop: isAdmin ? '1px solid #333' : 'none',
                 marginTop: isAdmin ? '8px' : '0',
-                paddingTop: isAdmin ? '16px' : (collapsed ? '12px' : '12px'),
-                color: 'white'
+                paddingTop: isAdmin ? '16px' : '12px'
               }}
               onMouseEnter={(e) => {
                 if (!isActive) e.currentTarget.style.backgroundColor = '#333'
@@ -115,9 +113,9 @@ export default function Sidebar({ activePage, onNavigate }: SidebarProps) {
       {!collapsed && (
         <div style={{
           padding: '16px',
-          borderTop: '1px solid #f0f0f0',
+          borderTop: '1px solid #333',
           fontSize: '11px',
-          color: 'white',
+          color: '#999',
           textAlign: 'center'
         }}>
           Portal TI v1.0
