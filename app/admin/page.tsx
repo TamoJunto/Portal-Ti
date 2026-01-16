@@ -3,10 +3,13 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Clock, Laptop, CheckCircle, XCircle, MessageSquare, Filter } from 'lucide-react'
+import { ArrowLeft, Clock, Laptop, CheckCircle, XCircle, Filter, ShieldX } from 'lucide-react'
 
 import Header from '@/components/Header'
 import Sidebar from '@/components/Sidebar'
+
+// Lista de emails que podem acessar o admin
+const ADMINS = ['geovana.silva@aliancaempreendedora.org.br'] // ADICIONE SEUS EMAILS AQUI
 
 interface SolicitacaoHoras {
   id: number
@@ -40,14 +43,9 @@ interface SolicitacaoEquipamento {
 export default function AdminPage() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [abaAtiva, setAbaAtiva] = useState<'horas' | 'equipamentos'>('horas')
   const [filtroStatus, setFiltroStatus] = useState('pendente')
-  const ADMINS = ['seu.email@alianca.com', 'outro.admin@alianca.com']
-
-// Se não for admin, redireciona
-    if (!ADMINS.includes(user.email)) {
-      router.push('/portal')
-    }
   
   const [solicitacoesHoras, setSolicitacoesHoras] = useState<SolicitacaoHoras[]>([])
   const [solicitacoesEquipamentos, setSolicitacoesEquipamentos] = useState<SolicitacaoEquipamento[]>([])
@@ -68,7 +66,17 @@ export default function AdminPage() {
         router.push('/login')
         return
       }
+      
       setUser(user)
+      
+      // Verificar se é admin
+      if (!ADMINS.includes(user.email || '')) {
+        setIsAdmin(false)
+        setLoading(false)
+        return
+      }
+      
+      setIsAdmin(true)
       await carregarSolicitacoes()
       setLoading(false)
     }
@@ -76,7 +84,6 @@ export default function AdminPage() {
   }, [])
 
   async function carregarSolicitacoes() {
-    // Carregar solicitações de horas
     const { data: horas } = await supabase
       .from('solicitacao_horas')
       .select('*')
@@ -84,7 +91,6 @@ export default function AdminPage() {
 
     if (horas) setSolicitacoesHoras(horas)
 
-    // Carregar solicitações de equipamentos
     const { data: equipamentos } = await supabase
       .from('solicitacao_equipamentos')
       .select('*')
@@ -96,6 +102,11 @@ export default function AdminPage() {
   const handleLogout = async () => {
     await supabase.auth.signOut()
     router.push('/login')
+  }
+
+  const handleNavigate = (page: string) => {
+    if (page === 'home') router.push('/portal')
+    else router.push(`/${page}`)
   }
 
   const abrirModal = (solicitacao: any, tipo: 'horas' | 'equipamentos') => {
@@ -135,7 +146,6 @@ export default function AdminPage() {
     setProcessando(false)
   }
 
-  // Filtrar solicitações
   const horasFiltradas = solicitacoesHoras.filter(s => 
     filtroStatus === 'todos' || s.status === filtroStatus
   )
@@ -143,7 +153,6 @@ export default function AdminPage() {
     filtroStatus === 'todos' || s.status === filtroStatus
   )
 
-  // Contadores
   const contadores = {
     horasPendentes: solicitacoesHoras.filter(s => s.status === 'pendente').length,
     equipamentosPendentes: solicitacoesEquipamentos.filter(s => s.status === 'pendente').length
@@ -185,6 +194,63 @@ export default function AdminPage() {
     )
   }
 
+  // Tela de acesso negado
+  if (!isAdmin) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: '#f5f5f5'
+      }}>
+        <Header userEmail={user?.email || ''} onLogout={handleLogout} />
+        
+        <div style={{ display: 'flex', flex: 1 }}>
+          <Sidebar activePage="admin" onNavigate={handleNavigate} />
+          
+          <main style={{ 
+            flex: 1, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            padding: '24px'
+          }}>
+            <div style={{
+              textAlign: 'center',
+              backgroundColor: 'white',
+              padding: '48px',
+              borderRadius: '12px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+            }}>
+              <ShieldX size={64} color="#d13438" style={{ marginBottom: '16px' }} />
+              <h1 style={{ margin: '0 0 8px 0', fontSize: '24px', color: '#333' }}>
+                Acesso Restrito
+              </h1>
+              <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: '#666' }}>
+                Você não tem permissão para acessar esta página.
+              </p>
+              <button
+                onClick={() => router.push('/portal')}
+                style={{
+                  padding: '12px 24px',
+                  backgroundColor: '#0078d4',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer'
+                }}
+              >
+                Voltar ao Portal
+              </button>
+            </div>
+          </main>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -195,10 +261,7 @@ export default function AdminPage() {
       <Header userEmail={user?.email || ''} onLogout={handleLogout} />
 
       <div style={{ display: 'flex', flex: 1 }}>
-        <Sidebar activePage="admin" onNavigate={(page) => {
-                    if (page === 'home') router.push('/portal')
-                      else router.push(`/${page}`)
-                  }} />
+        <Sidebar activePage="admin" onNavigate={handleNavigate} />
 
         <main style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
           <button
@@ -284,7 +347,6 @@ export default function AdminPage() {
             gap: '0',
             marginBottom: '16px',
             borderBottom: '2px solid #e0e0e0'
-
           }}>
             <button
               onClick={() => setAbaAtiva('horas')}
@@ -332,8 +394,7 @@ export default function AdminPage() {
                 marginBottom: '-2px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                
+                gap: '8px'
               }}
             >
               <Laptop size={16} />
@@ -404,8 +465,7 @@ export default function AdminPage() {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'flex-start',
-                        gap: '16px',
-                        
+                        gap: '16px'
                       }}
                     >
                       <div style={{ flex: 1 }}>
@@ -543,7 +603,7 @@ export default function AdminPage() {
                           marginBottom: '8px',
                           flexWrap: 'wrap'
                         }}>
-                          <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>
+                          <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#333' }}>
                             {sol.equipamento}
                           </h3>
                           <span style={{
@@ -713,7 +773,6 @@ export default function AdminPage() {
                   resize: 'vertical',
                   boxSizing: 'border-box',
                   color: '#333'
-                  
                 }}
               />
             </div>
@@ -788,5 +847,4 @@ export default function AdminPage() {
       )}
     </div>
   )
-
 }
