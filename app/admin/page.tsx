@@ -67,7 +67,7 @@ export default function AdminPage() {
       setUser(user)
       
       // Verificar se é admin na tabela usuarios do Supabase
-      const { data: usuario } = await supabase
+      const { data: usuario, error } = await supabase
         .from('usuarios')
         .select('is_admin')
         .eq('email', user.email)
@@ -854,4 +854,5 @@ export default function AdminPage() {
     </div>
   )
 }
+
 
