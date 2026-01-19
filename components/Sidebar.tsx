@@ -11,7 +11,8 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Building2
+  Building2,
+  Wrench
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -22,7 +23,8 @@ interface SidebarProps {
 
 const menuItems = [
   { id: 'home', label: 'Início', icon: Home, path: '/portal' },
-  { id: 'catalogo', label: 'Catálogo de Dados', icon: Database, path: '/catalogo' },    
+  { id: 'catalogo', label: 'Catálogo de Dados', icon: Database, path: '/catalogo' },
+  { id: 'ferramentas', label: 'Ferramentas', icon: Wrench, path: '/ferramentas' },
   { id: 'sharepoint', label: 'SharePoint', icon: Building2, path: '/sharepoint' },
   { id: 'horas', label: 'Solicitar Horas', icon: Clock, path: '/horas' },
   { id: 'equipamentos', label: 'Solicitar Equipamento', icon: Laptop, path: '/equipamentos' },
