@@ -72,7 +72,10 @@ export default function AdminPage() {
         .select('is_admin')
         .eq('email', user.email)
         .single()
-      
+      console.log('Email logado:', user.email)
+      console.log('Dados retornados:', usuario)
+      console.log('Erro:', error)
+            
       if (!usuario || !usuario.is_admin) {
         setIsAdmin(false)
         setLoading(false)
@@ -851,3 +854,4 @@ export default function AdminPage() {
     </div>
   )
 }
+
