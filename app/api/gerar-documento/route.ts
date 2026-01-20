@@ -221,12 +221,13 @@ export async function POST(request: NextRequest) {
 
     // Gerar buffer
     const buffer = await Packer.toBuffer(doc)
+    const uint8Array = new Uint8Array(buffer)
 
     if (formato === 'pdf') {
       // Para PDF, retornamos o DOCX por enquanto
       // A conversão para PDF requer LibreOffice no servidor
       // Alternativa: usar uma biblioteca como pdf-lib ou jspdf no frontend
-      return new NextResponse(buffer, {
+      return new NextResponse(uint8Array, {
         headers: {
           'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
           'Content-Disposition': `attachment; filename="${template.nome.replace(/\s+/g, '_')}.docx"`
@@ -234,7 +235,7 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    return new NextResponse(buffer, {
+    return new NextResponse(uint8Array, {
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'Content-Disposition': `attachment; filename="${template.nome.replace(/\s+/g, '_')}.docx"`
